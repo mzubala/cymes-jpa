@@ -33,11 +33,7 @@ public class CinemaRepositoryAdapter implements CinemaRepository {
     }
 }
 
-@Table(name = "cinemas",
-        indexes = {
-                @Index(columnList = "city, name", unique = true)
-        }
-)
+@Table(name = "cinemas")
 @Entity(name = "Cinema")
 @Data
 class CinemaEntity {
