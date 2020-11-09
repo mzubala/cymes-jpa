@@ -17,3 +17,7 @@ Feature: cinemas network can be managed
       | Warszawa | Arkadia      |
       | Warszawa | Złote Tarasy |
       | Wrocław  | Magnolia     |
+
+  Scenario: The one where network manager tries to create cinema that already exists
+    When network admin creates a cinema "Plaza" in "Lublin"
+    Then creating cinema "Plaza" in "Lublin" fails with conflict error

@@ -5,8 +5,10 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
+import pl.com.bottega.cymes.adapters.rest.Errors;
 import pl.com.bottega.cymes.client.CymesClient;
 import pl.com.bottega.cymes.client.DbClient;
 
@@ -49,5 +51,13 @@ public class StepDefs extends SpringAcceptanceTest {
             assertThat(cinema.getName()).isEqualTo(cinemaAttributes.get("name"));
         });
     }
+
+    @Then("creating cinema {string} in {string} fails with conflict error")
+    public void creating_cinema_in_fails_with_conflict_error(String name, String city) {
+        cymesClient.tryCreatingCinema(CreateCinemaRequest.builder().id(UUID.randomUUID().toString()).city(city).name(name).build())
+                .expectStatus().isEqualTo(HttpStatus.CONFLICT).expectBody(Errors.class)
+                .isEqualTo(Errors.of(new Errors.Error("CinemaExistsError", null)));
+    }
+
 
 }

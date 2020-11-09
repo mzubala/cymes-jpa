@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +20,8 @@ import pl.com.bottega.cymes.domain.ports.AdminService.CreateCinemaCommand;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static pl.com.bottega.cymes.domain.ports.CinemaRepository.CinemaExistsException;
 
 @RestController
 @RequestMapping("/cinemas")
@@ -57,5 +62,10 @@ public class CinemasResource {
             this.name = cinema.getName();
             this.city = cinema.getCity();
         }
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Errors> handleCinemaExistsException(CinemaExistsException exception) {
+        return new ResponseEntity<>(Errors.of(exception), HttpStatus.CONFLICT);
     }
 }

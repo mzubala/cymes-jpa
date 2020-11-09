@@ -6,9 +6,13 @@ import pl.com.bottega.cymes.domain.ports.AdminService.CreateCinemaCommand;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
+import static pl.com.bottega.cymes.domain.ports.CinemaRepository.CinemaExistsException;
 
 public class AdminServiceTest {
 
@@ -23,6 +27,19 @@ public class AdminServiceTest {
 
         // then
         verify(cinemaRepository, only()).save(new Cinema(id, "Lublin", "Plaza"));
+    }
+
+    @Test
+    public void throwsErrorWhenCinemaAlreadyExists() {
+        // given
+        Exception exception = new CinemaExistsException();
+        doThrow(exception).when(cinemaRepository).save(any(Cinema.class));
+
+        // then
+        assertThatThrownBy(() -> {
+            adminService.createCinema(new CreateCinemaCommand(UUID.randomUUID(), "Lublin", "Plaza"));
+        }).isEqualTo(exception);
+
     }
 
     @Test

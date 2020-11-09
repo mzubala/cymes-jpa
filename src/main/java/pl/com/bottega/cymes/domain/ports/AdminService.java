@@ -9,12 +9,14 @@ import pl.com.bottega.cymes.domain.model.Cinema;
 import java.util.List;
 import java.util.UUID;
 
+import static pl.com.bottega.cymes.domain.ports.CinemaRepository.*;
+
 @AllArgsConstructor
 public class AdminService {
 
     private final CinemaRepository cinemaRepository;
 
-    public void createCinema(CreateCinemaCommand command) {
+    public void createCinema(CreateCinemaCommand command) throws CinemaExistsException {
         var cinema = new Cinema(command.id, withoutSpaces(command.city), withoutSpaces(command.name));
         cinemaRepository.save(cinema);
     }
