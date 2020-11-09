@@ -21,7 +21,7 @@ public class AdminService {
         cinemaRepository.save(cinema);
     }
 
-    public List<Cinema> getAll() {
+    public List<Cinema> getCinemas() {
         return cinemaRepository.getAll();
     }
 
