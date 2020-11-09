@@ -26,11 +26,7 @@ public class CinemaRepositoryAdapter implements CinemaRepository {
     private SpringDataCinemaRepository springDataCinemaRepository;
 
     public void save(Cinema cinema) {
-        try {
-            springDataCinemaRepository.save(new CinemaEntity(cinema));
-        } catch (DataIntegrityViolationException ex) {
-            throw new CinemaExistsException();
-        }
+        springDataCinemaRepository.save(new CinemaEntity(cinema));
     }
 
     @Override
@@ -39,11 +35,7 @@ public class CinemaRepositoryAdapter implements CinemaRepository {
     }
 }
 
-@Table(name = "cinemas",
-        indexes = {
-                @Index(columnList = "city, name", unique = true)
-        }
-)
+@Table(name = "cinemas")
 @Entity(name = "Cinema")
 @Data
 class CinemaEntity {
@@ -70,5 +62,6 @@ class CinemaEntity {
 
 interface SpringDataCinemaRepository extends Repository<CinemaEntity, Long> {
     void save(CinemaEntity cinemaEntity);
+
     Stream<CinemaEntity> findAll(Sort sort);
 }
