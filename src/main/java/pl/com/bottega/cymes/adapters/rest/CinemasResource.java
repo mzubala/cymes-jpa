@@ -32,7 +32,7 @@ public class CinemasResource {
 
     @GetMapping
     public List<CinemaResponse> all() {
-        return adminService.getAll().stream().map(CinemaResponse::new).collect(Collectors.toList());
+        return adminService.getCinemas().stream().map(CinemaResponse::new).collect(Collectors.toList());
     }
 
     @Data
