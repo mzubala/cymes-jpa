@@ -2,6 +2,8 @@ package pl.com.bottega.cymes.adapters.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,7 @@ import pl.com.bottega.cymes.domain.ports.CinemaRepository;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import java.util.List;
 import java.util.UUID;
