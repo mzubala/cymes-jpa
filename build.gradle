@@ -1,0 +1,76 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+    id "io.freefair.lombok" version "5.3.0"
+}
+
+group 'pl.com.bottega'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    integration {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration/java')
+        }
+        resources.srcDir file('src/integration/resources')
+    }
+}
+
+configurations {
+    integrationImplementation.extendsFrom testImplementation
+    integrationRuntime.extendsFrom testRuntime
+    cucumberRuntime {
+        extendsFrom integrationImplementation
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testCompile("org.assertj:assertj-core:3.11.1")
+    integrationImplementation group: 'io.cucumber', name: 'cucumber-java', version: '6.8.2'
+    integrationImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '6.8.2'
+    integrationImplementation group: 'io.cucumber', name: 'cucumber-spring', version: '6.8.2'
+
+}
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integration.output.classesDirs
+    classpath = sourceSets.integration.runtimeClasspath
+}
+
+check.dependsOn integrationTest
+
+test {
+    useJUnitPlatform()
+}
+
+integrationTest {
+    useJUnitPlatform()
+}
+
+task cucumber() {
+    dependsOn assemble, integrationClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output + sourceSets.integration.output
+            args = ['--plugin', 'pretty', '--glue', 'pl.com.bottega.cymes.acceptance', 'src/integration/resources']
+        }
+    }
+}
+
+check.dependsOn cucumber
