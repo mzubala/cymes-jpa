@@ -2,7 +2,6 @@ package pl.com.bottega.cymes.adapters.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.Repository;

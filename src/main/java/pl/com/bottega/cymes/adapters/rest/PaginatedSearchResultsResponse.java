@@ -4,12 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Value;
 
 import java.util.List;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.toList;
 
 @Data
 @AllArgsConstructor

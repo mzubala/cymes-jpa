@@ -10,23 +10,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.Errors;
-import pl.com.bottega.cymes.adapters.rest.MoviesResource;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
 import pl.com.bottega.cymes.client.CymesClient;
 import pl.com.bottega.cymes.client.DbClient;
 import pl.com.bottega.cymes.domain.model.Genere;
 
 import java.time.Duration;
-import java.time.Period;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static pl.com.bottega.cymes.adapters.rest.MoviesResource.*;
+import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
+import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
 
 public class StepDefs extends SpringAcceptanceTest {
 

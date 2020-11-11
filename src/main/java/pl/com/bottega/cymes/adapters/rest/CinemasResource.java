@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.com.bottega.cymes.domain.model.Cinema;
-import pl.com.bottega.cymes.domain.ports.AdminService;
 import pl.com.bottega.cymes.domain.model.commands.CreateCinemaCommand;
+import pl.com.bottega.cymes.domain.ports.AdminService;
 
 import java.util.List;
 import java.util.UUID;

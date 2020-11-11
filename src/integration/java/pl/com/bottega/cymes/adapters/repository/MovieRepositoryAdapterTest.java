@@ -10,9 +10,11 @@ import pl.com.bottega.cymes.domain.model.queries.PaginatedSearchResults;
 import pl.com.bottega.cymes.domain.model.queries.Pagination;
 import pl.com.bottega.cymes.domain.ports.AggregateNotFoundException;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -56,8 +58,8 @@ public class MovieRepositoryAdapterTest extends SpringAdapterTest {
 
         // then
         assertThat(searchResults).isEqualTo(new PaginatedSearchResults<BasicMovieInformation>(
-            List.of(new BasicMovieInformation(m2.getId(), m2.getTitle()),new BasicMovieInformation(m1.getId(), m1.getTitle())),
-            new Pagination(10, 1), 2L, 1L
+                List.of(new BasicMovieInformation(m2.getId(), m2.getTitle()), new BasicMovieInformation(m1.getId(), m1.getTitle())),
+                new Pagination(10, 1), 2L, 1L
         ));
     }
 
@@ -82,8 +84,39 @@ public class MovieRepositoryAdapterTest extends SpringAdapterTest {
 
         // then
         assertThat(searchResults).isEqualTo(new PaginatedSearchResults<BasicMovieInformation>(
-                List.of(new BasicMovieInformation(m1.getId(), m1.getTitle()),new BasicMovieInformation(m3.getId(), m3.getTitle())),
+                List.of(new BasicMovieInformation(m1.getId(), m1.getTitle()), new BasicMovieInformation(m3.getId(), m3.getTitle())),
                 new Pagination(10, 1), 2L, 1L
         ));
+    }
+
+    @Test
+    public void paginatesSearchResults() {
+        // given
+        int n = 50;
+        List<BasicMovieInformation> movies = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            var movie = MovieExample.builder().title("m" + i).build().toDomain();
+            movieRepositoryAdapter.save(movie);
+            movies.add(new BasicMovieInformation(movie.getId(), movie.getTitle()));
+        }
+        movies.sort(comparing(BasicMovieInformation::getTitle));
+
+        // when
+        var page1 = movieRepositoryAdapter.search(new BasicMovieQuery("m", new Pagination(10, 1)));
+        var page3 = movieRepositoryAdapter.search(new BasicMovieQuery("m", new Pagination(10, 3)));
+
+        // then
+        assertThat(page1).isEqualTo(
+                new PaginatedSearchResults<>(
+                        movies.subList(0, 10),
+                        new Pagination(10, 1), (long) n, 5L
+                )
+        );
+        assertThat(page3).isEqualTo(
+                new PaginatedSearchResults<>(
+                        movies.subList(20, 30),
+                        new Pagination(10, 3), (long) n, 5L
+                )
+        );
     }
 }

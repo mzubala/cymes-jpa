@@ -72,7 +72,7 @@ public class MovieRepositoryAdapter implements MovieRepository {
                 results,
                 query.getPagination(),
                 totalCount,
-                totalCount / query.getPagination().getPerPage() + totalCount % query.getPagination().getPerPage() > 0 ? 1L : 0L
+                (totalCount / query.getPagination().getPerPage()) + (totalCount % query.getPagination().getPerPage() > 0 ? 1L : 0L)
         );
     }
 }

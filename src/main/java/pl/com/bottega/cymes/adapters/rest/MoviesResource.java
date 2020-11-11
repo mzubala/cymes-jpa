@@ -16,7 +16,6 @@ import pl.com.bottega.cymes.domain.model.queries.BasicMovieQuery;
 import pl.com.bottega.cymes.domain.model.queries.Pagination;
 import pl.com.bottega.cymes.domain.ports.AdminService;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.time.Duration;
 import java.util.Set;
 import java.util.UUID;
