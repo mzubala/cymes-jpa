@@ -2,7 +2,7 @@ package pl.com.bottega.cymes.domain.ports;
 
 import org.junit.jupiter.api.Test;
 import pl.com.bottega.cymes.domain.model.Cinema;
-import pl.com.bottega.cymes.domain.ports.AdminService.CreateCinemaCommand;
+import pl.com.bottega.cymes.domain.model.commands.CreateCinemaCommand;
 
 import java.util.UUID;
 
@@ -17,7 +17,8 @@ import static pl.com.bottega.cymes.domain.ports.CinemaRepository.CinemaExistsExc
 public class AdminServiceTest {
 
     private CinemaRepository cinemaRepository = mock(CinemaRepository.class);
-    private AdminService adminService = new AdminService(cinemaRepository);
+    private MovieRepository movieRepository = mock(MovieRepository.class);
+    private AdminService adminService = new AdminService(cinemaRepository, movieRepository);
 
     @Test
     public void createsCinema() {

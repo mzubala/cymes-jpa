@@ -2,7 +2,7 @@ Feature: cinemas network can be managed
 
   Scenario: the one where network admin creates a new cinema
     When network admin creates a cinema "Plaza" in "Lublin"
-    Then cinemas list contains following cinemas:
+    Then admin cinemas list contains following cinemas:
       | city   | name  |
       | Lublin | Plaza |
 
@@ -11,7 +11,7 @@ Feature: cinemas network can be managed
     And network admin creates a cinema "Złote Tarasy" in "Warszawa"
     And network admin creates a cinema "Arkadia" in "Warszawa"
     And network admin creates a cinema "Magnolia" in "Wrocław"
-    Then cinemas list contains following cinemas:
+    Then admin cinemas list contains following cinemas:
       | city     | name         |
       | Lublin   | Plaza        |
       | Warszawa | Arkadia      |

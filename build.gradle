@@ -44,7 +44,7 @@ dependencies {
     integrationImplementation group: 'io.cucumber', name: 'cucumber-java', version: '6.8.2'
     integrationImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '6.8.2'
     integrationImplementation group: 'io.cucumber', name: 'cucumber-spring', version: '6.8.2'
-
+    integrationCompile sourceSets.test.output
 }
 
 task integrationTest(type: Test) {
