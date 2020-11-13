@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static pl.com.bottega.cymes.adapters.rest.CinemasResource.*;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
 
@@ -43,6 +44,7 @@ public class StepDefs extends SpringAcceptanceTest {
         dbClient.clean();
     }
 
+    @Given("cinema {string} in {string} has been created")
     @When("network admin creates a cinema {string} in {string}")
     public void network_admin_creates_a_cinema_in(String name, String city) {
         cymesClient.createCinema(CreateCinemaRequest.builder().id(UUID.randomUUID().toString()).city(city).name(name).build());
@@ -93,5 +95,26 @@ public class StepDefs extends SpringAcceptanceTest {
             assertThat(movie.getId()).isNotNull();
             assertThat(movie.getTitle()).isEqualTo(movieAttributes.get("title"));
         });
+    }
+
+    @When("network admin creates cinema hall {string} in {string} {string}:")
+    public void network_admin_creates_cinema_hall_in(String cinemaHallNumber, String city, String cinemaName, io.cucumber.datatable.DataTable dataTable) {
+        var cinemaId = cymesClient.getCinemaId(cinemaName, city);
+        var request = new CreateCinemaHallRequest(cinemaHallNumber, dataTable.asList());
+        cymesClient.createCinemaHall(cinemaId, request);
+    }
+
+    @Then("cinema halls list in {string} {string} contains:")
+    public void cinema_halls_list_in_contains(String city, String cinemaName, io.cucumber.datatable.DataTable dataTable) {
+        var cinemaId = cymesClient.getCinemaId(cinemaName, city);
+        var cinemaHalls = cymesClient.getCinemaHalls(cinemaId);
+        assertThat(cinemaHalls).isEqualTo(dataTable.asList());
+    }
+
+    @Then("cinema hall {string} in {string} {string} contains following rows:")
+    public void cinema_hall_in_contains_following_rows(String cinemaHallNumber, String city, String cinemaName, io.cucumber.datatable.DataTable dataTable) {
+        var cinemaId = cymesClient.getCinemaId(cinemaName, city);
+        var cinemaHallInfo = cymesClient.getCinemaHall(cinemaId, cinemaHallNumber);
+        assertThat(cinemaHallInfo.getRows()).isEqualTo(dataTable.asList());
     }
 }
