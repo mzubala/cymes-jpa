@@ -2,17 +2,15 @@ package pl.com.bottega.cymes.client;
 
 import lombok.AllArgsConstructor;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import pl.com.bottega.cymes.adapters.rest.CinemasResource;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaResponse;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
-import static pl.com.bottega.cymes.adapters.rest.CinemasResource.*;
+import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaHallResponse;
 import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;

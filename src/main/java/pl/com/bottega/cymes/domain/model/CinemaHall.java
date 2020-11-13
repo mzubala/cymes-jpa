@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Getter

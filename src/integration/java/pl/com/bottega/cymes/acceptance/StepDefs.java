@@ -23,7 +23,7 @@ import java.util.UUID;
 
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static pl.com.bottega.cymes.adapters.rest.CinemasResource.*;
+import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
 
