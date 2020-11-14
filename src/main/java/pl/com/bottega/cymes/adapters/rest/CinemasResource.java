@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.com.bottega.cymes.domain.model.Cinema;
-import pl.com.bottega.cymes.domain.model.commands.CreateCinemaCommand;
-import pl.com.bottega.cymes.domain.ports.AdminService;
+import pl.com.bottega.cymes.domain.ports.CinemaRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,16 +27,16 @@ import static pl.com.bottega.cymes.domain.ports.CinemaRepository.CinemaExistsExc
 public class CinemasResource {
 
     @Autowired
-    private AdminService adminService;
+    private CinemaRepository cinemaRepository;
 
     @PostMapping
     public void create(@RequestBody CreateCinemaRequest request) {
-        adminService.createCinema(new CreateCinemaCommand(UUID.fromString(request.id), request.city, request.name));
+        cinemaRepository.save(request.toDomain());
     }
 
     @GetMapping
     public List<CinemaResponse> all() {
-        return adminService.getCinemas().stream().map(CinemaResponse::new).collect(Collectors.toList());
+        return cinemaRepository.getAll().stream().map(CinemaResponse::new).collect(Collectors.toList());
     }
 
     @Data
@@ -46,6 +45,10 @@ public class CinemasResource {
         private String id;
         private String name;
         private String city;
+
+        public Cinema toDomain() {
+            return new Cinema(UUID.fromString(id), city, name);
+        }
     }
 
     @Data
