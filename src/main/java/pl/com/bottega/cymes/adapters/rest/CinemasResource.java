@@ -17,9 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.com.bottega.cymes.domain.model.Cinema;
 import pl.com.bottega.cymes.domain.model.CinemaHall;
-import pl.com.bottega.cymes.domain.model.CinemaHall.Row;
-import pl.com.bottega.cymes.domain.model.commands.CreateCinemaCommand;
-import pl.com.bottega.cymes.domain.ports.AdminService;
 import pl.com.bottega.cymes.domain.ports.CinemaHallRepository;
 import pl.com.bottega.cymes.domain.ports.CinemaRepository;
 
@@ -28,6 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pl.com.bottega.cymes.domain.model.CinemaHall.CinemaHallId;
+import static pl.com.bottega.cymes.domain.model.CinemaHall.Row;
 import static pl.com.bottega.cymes.domain.model.CinemaHall.of;
 import static pl.com.bottega.cymes.domain.ports.CinemaRepository.CinemaExistsException;
 
@@ -36,20 +34,18 @@ import static pl.com.bottega.cymes.domain.ports.CinemaRepository.CinemaExistsExc
 public class CinemasResource {
 
     @Autowired
-    private AdminService adminService;
-    @Autowired
     private CinemaRepository cinemaRepository;
     @Autowired
     private CinemaHallRepository cinemaHallRepository;
 
     @PostMapping
     public void create(@RequestBody CreateCinemaRequest request) {
-        adminService.createCinema(new CreateCinemaCommand(UUID.fromString(request.id), request.city, request.name));
+        cinemaRepository.save(request.toDomain());
     }
 
     @GetMapping
     public List<CinemaResponse> all() {
-        return adminService.getCinemas().stream().map(CinemaResponse::new).collect(Collectors.toList());
+        return cinemaRepository.getAll().stream().map(CinemaResponse::new).collect(Collectors.toList());
     }
 
     @PutMapping("/{cinemaId}/halls")
@@ -79,6 +75,10 @@ public class CinemasResource {
         private String id;
         private String name;
         private String city;
+
+        public Cinema toDomain() {
+            return new Cinema(UUID.fromString(id), city, name);
+        }
     }
 
     @Data

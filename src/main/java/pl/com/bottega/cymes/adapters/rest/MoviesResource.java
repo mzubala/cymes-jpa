@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.com.bottega.cymes.domain.model.Genere;
-import pl.com.bottega.cymes.domain.model.commands.CreateMovieCommand;
+import pl.com.bottega.cymes.domain.model.Movie;
 import pl.com.bottega.cymes.domain.model.queries.BasicMovieInformation;
 import pl.com.bottega.cymes.domain.model.queries.BasicMovieQuery;
 import pl.com.bottega.cymes.domain.model.queries.Pagination;
-import pl.com.bottega.cymes.domain.ports.AdminService;
+import pl.com.bottega.cymes.domain.ports.MovieRepository;
 
 import java.time.Duration;
 import java.util.Set;
@@ -27,24 +27,16 @@ import static java.util.stream.Collectors.toList;
 public class MoviesResource {
 
     @Autowired
-    private AdminService adminService;
+    private MovieRepository movieRepository;
 
     @PostMapping
     public void create(@RequestBody CreateMovieRequest createMovieRequest) {
-        adminService.createMovie(new CreateMovieCommand(
-                UUID.fromString(createMovieRequest.id),
-                createMovieRequest.title,
-                createMovieRequest.productionYear,
-                createMovieRequest.description,
-                createMovieRequest.duration,
-                createMovieRequest.actors,
-                createMovieRequest.generes
-        ));
+        movieRepository.save(createMovieRequest.toDomain());
     }
 
     @GetMapping
     public PaginatedSearchResultsResponse<BasicMovieInformationResponse> search(SearchMoviesRequest request) {
-        var paginatedSearchResults = adminService.search(request.toQuery());
+        var paginatedSearchResults = movieRepository.search(request.toQuery());
         return new PaginatedSearchResultsResponse<>(
                 paginatedSearchResults.getResults().stream().map(BasicMovieInformationResponse::new).collect(toList()),
                 new PaginationResponse(paginatedSearchResults.getPagination()),
@@ -63,6 +55,10 @@ public class MoviesResource {
         private Duration duration;
         private Set<String> actors;
         private Set<Genere> generes;
+
+        public Movie toDomain() {
+            return new Movie(UUID.randomUUID(), title, productionYear, description, duration, actors, generes);
+        }
     }
 
     @Data
