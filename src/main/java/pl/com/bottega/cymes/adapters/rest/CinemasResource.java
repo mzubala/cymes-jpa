@@ -21,6 +21,7 @@ import pl.com.bottega.cymes.domain.model.CinemaHall.Row;
 import pl.com.bottega.cymes.domain.model.commands.CreateCinemaCommand;
 import pl.com.bottega.cymes.domain.ports.AdminService;
 import pl.com.bottega.cymes.domain.ports.CinemaHallRepository;
+import pl.com.bottega.cymes.domain.ports.CinemaRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,8 @@ public class CinemasResource {
     @Autowired
     private AdminService adminService;
     @Autowired
+    private CinemaRepository cinemaRepository;
+    @Autowired
     private CinemaHallRepository cinemaHallRepository;
 
     @PostMapping
@@ -51,6 +54,7 @@ public class CinemasResource {
 
     @PutMapping("/{cinemaId}/halls")
     public void createCinemaHall(@PathVariable String cinemaId, @RequestBody CreateCinemaHallRequest createCinemaHallRequest) {
+        cinemaRepository.get(UUID.fromString(cinemaId));
         cinemaHallRepository.save(createCinemaHallRequest.toCinemaHall(cinemaId));
     }
 

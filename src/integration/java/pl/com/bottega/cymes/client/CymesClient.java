@@ -52,12 +52,16 @@ public class CymesClient {
     }
 
     public void createCinemaHall(String cinemaId, CreateCinemaHallRequest request) {
-        var response = webClient
+        var response = tryCreatingCinemaHall(cinemaId, request);
+        response.expectStatus().is2xxSuccessful();
+    }
+
+    public ResponseSpec tryCreatingCinemaHall(String cinemaId, CreateCinemaHallRequest request) {
+        return webClient
                 .put()
                 .uri((builder) -> builder.path("/cinemas/{id}/halls").build(cinemaId))
                 .bodyValue(request)
                 .exchange();
-        response.expectStatus().is2xxSuccessful();
     }
 
     public List<String> getCinemaHalls(String cinemaId) {

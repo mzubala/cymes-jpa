@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 import pl.com.bottega.cymes.domain.model.Cinema;
+import pl.com.bottega.cymes.domain.ports.AggregateNotFoundException;
 import pl.com.bottega.cymes.domain.ports.CinemaRepository;
 
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +37,13 @@ public class CinemaRepositoryAdapter implements CinemaRepository {
     @Override
     public List<Cinema> getAll() {
         return springDataCinemaRepository.findAll(Sort.by("city", "name")).map(CinemaEntity::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public Cinema get(UUID cinemaId) throws AggregateNotFoundException {
+        return springDataCinemaRepository.findById(cinemaId)
+                .map(CinemaEntity::toDomain)
+                .orElseThrow(() -> new AggregateNotFoundException(Cinema.class, cinemaId));
     }
 }
 
@@ -69,5 +78,8 @@ class CinemaEntity {
 
 interface SpringDataCinemaRepository extends Repository<CinemaEntity, Long> {
     void save(CinemaEntity cinemaEntity);
+
     Stream<CinemaEntity> findAll(Sort sort);
+
+    Optional<CinemaEntity> findById(UUID cinemaId);
 }
