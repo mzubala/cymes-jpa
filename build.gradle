@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation group: 'com.h2database', name: 'h2', version: '1.4.200'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation("com.google.guava:guava:30.0-jre")
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
@@ -44,7 +45,7 @@ dependencies {
     integrationImplementation group: 'io.cucumber', name: 'cucumber-java', version: '6.8.2'
     integrationImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '6.8.2'
     integrationImplementation group: 'io.cucumber', name: 'cucumber-spring', version: '6.8.2'
-
+    integrationCompile sourceSets.test.output
 }
 
 task integrationTest(type: Test) {
