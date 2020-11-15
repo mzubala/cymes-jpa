@@ -5,7 +5,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaResponse;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
+import pl.com.bottega.cymes.adapters.rest.ShowsResource;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,7 @@ import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaHallRespo
 import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
+import static pl.com.bottega.cymes.adapters.rest.ShowsResource.*;
 
 @AllArgsConstructor
 public class CymesClient {
@@ -65,7 +68,7 @@ public class CymesClient {
     }
 
     public List<String> getCinemaHalls(String cinemaId) {
-        return  List.of(webClient.get()
+        return List.of(webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/cinemas/{id}/halls").build(cinemaId))
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -81,5 +84,25 @@ public class CymesClient {
                 .getResponseBody().blockFirst();
     }
 
-    static class GetMoviesResponse extends PaginatedSearchResultsResponse<BasicMovieInformationResponse> {}
+    public void scheduleShow(ScheduleShowRequest request) {
+        webClient.post().uri("/shows").bodyValue(request).exchange().expectStatus().is2xxSuccessful();
+    }
+
+    public String getMovieId(String title) {
+        return getMovies().getResults().stream().filter((movie) -> movie.getTitle().equals(title)).findFirst().map(BasicMovieInformationResponse::getId).orElseThrow();
+    }
+
+    public List<SearchedShowResponse> searchShows(SearchShowsRequest request) {
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/shows")
+                .queryParam("cinemaId", request.getCinemaId())
+                .queryParam("city", request.getCity())
+                .queryParam("day", request.getDay().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .build()
+        ).exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(SearchedShowResponse.class).getResponseBody().collectList().block();
+    }
+
+    static class GetMoviesResponse extends PaginatedSearchResultsResponse<BasicMovieInformationResponse> {
+    }
 }

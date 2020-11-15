@@ -11,21 +11,29 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.Errors;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
+import pl.com.bottega.cymes.adapters.rest.ShowsResource;
 import pl.com.bottega.cymes.client.CymesClient;
 import pl.com.bottega.cymes.client.DbClient;
 import pl.com.bottega.cymes.domain.model.Genere;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
+import static pl.com.bottega.cymes.adapters.rest.ShowsResource.*;
 
 public class StepDefs extends SpringAcceptanceTest {
 
@@ -98,6 +106,7 @@ public class StepDefs extends SpringAcceptanceTest {
     }
 
     @When("network admin creates cinema hall {string} in {string} {string}:")
+    @Given("network admin created cinema hall {string} in {string} {string}:")
     public void network_admin_creates_cinema_hall_in(String cinemaHallNumber, String city, String cinemaName, io.cucumber.datatable.DataTable dataTable) {
         var cinemaId = cymesClient.getCinemaId(cinemaName, city);
         var request = new CreateCinemaHallRequest(cinemaHallNumber, dataTable.asList());
@@ -116,5 +125,28 @@ public class StepDefs extends SpringAcceptanceTest {
         var cinemaId = cymesClient.getCinemaId(cinemaName, city);
         var cinemaHallInfo = cymesClient.getCinemaHall(cinemaId, cinemaHallNumber);
         assertThat(cinemaHallInfo.getRows()).isEqualTo(dataTable.asList());
+    }
+
+    @When("network admin schedules shows:")
+    public void network_admin_schedules_shows(io.cucumber.datatable.DataTable dataTable) {
+        dataTable.asMaps().forEach((showAttributes) -> {
+            var cinemaId = cymesClient.getCinemaId(showAttributes.get("cinema"), showAttributes.get("city"));
+            var movieId = cymesClient.getMovieId(showAttributes.get("movie"));
+            cymesClient.scheduleShow(ScheduleShowRequest.builder()
+                    .cinemaId(cinemaId)
+                    .cinemaHallNumber(showAttributes.get("hall"))
+                    .movieId(movieId)
+                    .startTime(Instant.parse(showAttributes.get("startTime")))
+                    .build());
+        });
+    }
+
+    @Then("customer can see repertoire for {string} {string} on {string}:")
+    public void customer_can_see_repertoire_for_on(String city, String cinemaName, String dateString, io.cucumber.datatable.DataTable dataTable) {
+        var cinemaId = cymesClient.getCinemaId(cinemaName, city);
+        var shows = cymesClient.searchShows(SearchShowsRequest.builder().cinemaId(cinemaId).day(LocalDate.parse(dateString)).build());
+        assertThat(
+                shows.stream().map((show) -> List.of(show.getTitle(), DateTimeFormatter.ISO_INSTANT.format(show.getStartTime()))).collect(toList())
+        ).isEqualTo(dataTable.asLists());
     }
 }
