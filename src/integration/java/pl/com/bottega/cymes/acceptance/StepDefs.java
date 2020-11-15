@@ -11,7 +11,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.Errors;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
-import pl.com.bottega.cymes.adapters.rest.ShowsResource;
 import pl.com.bottega.cymes.client.CymesClient;
 import pl.com.bottega.cymes.client.DbClient;
 import pl.com.bottega.cymes.domain.model.Genere;
@@ -24,16 +23,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
-import static pl.com.bottega.cymes.adapters.rest.ShowsResource.*;
+import static pl.com.bottega.cymes.adapters.rest.ShowsResource.ScheduleShowRequest;
+import static pl.com.bottega.cymes.adapters.rest.ShowsResource.SearchShowsRequest;
 
 public class StepDefs extends SpringAcceptanceTest {
 

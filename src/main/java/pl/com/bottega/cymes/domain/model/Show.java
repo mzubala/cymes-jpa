@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
-import static pl.com.bottega.cymes.domain.model.CinemaHall.*;
+import static pl.com.bottega.cymes.domain.model.CinemaHall.CinemaHallId;
 
 @AllArgsConstructor
 @Getter

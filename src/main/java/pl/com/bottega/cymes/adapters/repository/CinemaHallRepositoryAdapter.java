@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static pl.com.bottega.cymes.domain.model.CinemaHall.*;
+import static pl.com.bottega.cymes.domain.model.CinemaHall.Row;
 
 @Component
 public class CinemaHallRepositoryAdapter implements CinemaHallRepository {

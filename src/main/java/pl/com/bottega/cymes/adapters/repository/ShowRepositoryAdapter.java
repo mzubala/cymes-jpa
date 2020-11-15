@@ -6,10 +6,6 @@ import org.springframework.stereotype.Component;
 import pl.com.bottega.cymes.domain.model.Show;
 import pl.com.bottega.cymes.domain.ports.ShowRepository;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;

@@ -5,7 +5,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaResponse;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
-import pl.com.bottega.cymes.adapters.rest.ShowsResource;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -16,7 +15,9 @@ import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaHallRespo
 import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
-import static pl.com.bottega.cymes.adapters.rest.ShowsResource.*;
+import static pl.com.bottega.cymes.adapters.rest.ShowsResource.ScheduleShowRequest;
+import static pl.com.bottega.cymes.adapters.rest.ShowsResource.SearchShowsRequest;
+import static pl.com.bottega.cymes.adapters.rest.ShowsResource.SearchedShowResponse;
 
 @AllArgsConstructor
 public class CymesClient {
