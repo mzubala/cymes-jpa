@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +25,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static pl.com.bottega.cymes.domain.model.CinemaHall.CinemaHallId;
 import static pl.com.bottega.cymes.domain.ports.RepertoireBrowser.SearchedShow;
+import static pl.com.bottega.cymes.domain.ports.ShowScheduler.*;
 
 @RestController
 @RequestMapping("/shows")
@@ -43,6 +48,11 @@ public class ShowsResource {
     @GetMapping
     public List<SearchedShowResponse> search(SearchShowsRequest searchShowsRequest) {
         return repertoireBrowser.search(searchShowsRequest.toQuery()).stream().map((show) -> new SearchedShowResponse(show)).collect(toList());
+    }
+
+    @ExceptionHandler(CinemaHallOccupiedException.class)
+    public ResponseEntity<Errors> handleCinemaHallOccupiedException(CinemaHallOccupiedException ex) {
+        return new ResponseEntity<>(Errors.of(ex), CONFLICT);
     }
 
     @Data

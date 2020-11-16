@@ -28,6 +28,9 @@ public class DefaultShowScheduler implements ShowScheduler {
         var cinemaHall = cinemaHallRepository.get(command.getCinemaHallId());
         var movie = movieRepository.get(command.getMovieId());
         var show = new Show(UUID.randomUUID(), cinemaHall.getId(), movie.getId(), command.getStartTime(), endTime(command, movie));
+        if(showRepository.containsShowsCollidingWith(show)) {
+            throw new CinemaHallOccupiedException();
+        }
         showRepository.save(show);
     }
 

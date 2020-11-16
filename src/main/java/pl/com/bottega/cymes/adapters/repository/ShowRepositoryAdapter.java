@@ -32,6 +32,11 @@ public class ShowRepositoryAdapter implements ShowRepository {
                 show.getStartAt(), show.getEndAt()
         ));
     }
+
+    @Override
+    public boolean containsShowsCollidingWith(Show show) {
+        return false;
+    }
 }
 
 @Entity(name = "Show")
