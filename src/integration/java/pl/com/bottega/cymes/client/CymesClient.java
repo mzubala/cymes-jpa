@@ -86,7 +86,11 @@ public class CymesClient {
     }
 
     public void scheduleShow(ScheduleShowRequest request) {
-        webClient.post().uri("/shows").bodyValue(request).exchange().expectStatus().is2xxSuccessful();
+        trySchedulingShow(request).expectStatus().is2xxSuccessful();
+    }
+
+    public ResponseSpec trySchedulingShow(ScheduleShowRequest request) {
+        return webClient.post().uri("/shows").bodyValue(request).exchange();
     }
 
     public String getMovieId(String title) {

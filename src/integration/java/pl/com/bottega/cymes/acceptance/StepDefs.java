@@ -147,4 +147,20 @@ public class StepDefs extends SpringAcceptanceTest {
                 shows.stream().map((show) -> List.of(show.getTitle(), DateTimeFormatter.ISO_INSTANT.format(show.getStartTime()))).collect(toList())
         ).isEqualTo(dataTable.asLists());
     }
+
+    @Then("scheduling fails with conflict for shows:")
+    public void scheduling_fails_with_conflict_for_shows(io.cucumber.datatable.DataTable dataTable) {
+        dataTable.asMaps().forEach((showAttributes) -> {
+            var cinemaId = cymesClient.getCinemaId(showAttributes.get("cinema"), showAttributes.get("city"));
+            var movieId = cymesClient.getMovieId(showAttributes.get("movie"));
+            cymesClient.trySchedulingShow(ScheduleShowRequest.builder()
+                    .cinemaId(cinemaId)
+                    .cinemaHallNumber(showAttributes.get("hall"))
+                    .movieId(movieId)
+                    .startTime(Instant.parse(showAttributes.get("startTime")))
+                    .build()
+            ).expectStatus().isEqualTo(HttpStatus.CONFLICT);
+        });
+    }
+
 }

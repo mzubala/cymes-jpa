@@ -30,3 +30,11 @@ Feature: Shows can be scheduled
       | Batman | 2020-01-01T15:00:00Z |
     And customer can see repertoire for "Warszawa" "Arkadia" on "2020-01-02":
       | Pulp Fiction | 2020-01-02T18:00:00Z |
+
+  Scenario: The one when network admin tries to schedule colliding shows
+    When network admin schedules shows:
+      | cinema | city   | hall | movie  | startTime            |
+      | Plaza  | Lublin | 1    | Batman | 2020-01-01T10:00:00Z |
+    Then scheduling fails with conflict for shows:
+      | cinema | city   | hall | movie        | startTime            |
+      | Plaza  | Lublin | 1    | Pulp Fiction | 2020-01-01T10:30:00Z |
