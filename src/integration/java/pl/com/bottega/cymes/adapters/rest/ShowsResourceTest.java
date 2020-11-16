@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.ChronoUnit.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,10 +46,6 @@ public class ShowsResourceTest extends SpringAdapterTest {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private int usersCount = 10;
-
-    private ExecutorService executorService = Executors.newFixedThreadPool(usersCount);
-
     @BeforeEach
     public void setup() {
         super.setup();
@@ -58,13 +55,18 @@ public class ShowsResourceTest extends SpringAdapterTest {
     }
 
     @Test
-    public void doesNotIntroduceConflictingShows() {
+    public void doesNotIntroduceConflictingShows() throws InterruptedException {
+        var usersCount = 10;
+        var executorService = Executors.newFixedThreadPool(usersCount);
         for (int i = 0; i < usersCount; i++) {
-            var resp = cymesClient.trySchedulingShow(new ScheduleShowRequest(
-                    lublinPlaza.getId().toString(), lbnHall1.getId().getNumber(), batman.getId().toString(), Instant.now().plus(1, DAYS)
-            ));
+            executorService.submit(() -> {
+                cymesClient.trySchedulingShow(new ScheduleShowRequest(
+                        lublinPlaza.getId().toString(), lbnHall1.getId().getNumber(), batman.getId().toString(), Instant.now().plus(1, DAYS)
+                ));
+            });
         }
-
+        executorService.shutdown();
+        executorService.awaitTermination(10, TimeUnit.SECONDS);
         assertThat(entityManager.createQuery("SELECT count(show) FROM Show show").getSingleResult()).isEqualTo(1L);
     }
 
