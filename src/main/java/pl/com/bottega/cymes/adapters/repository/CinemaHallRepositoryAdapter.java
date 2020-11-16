@@ -25,6 +25,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.List;
@@ -78,6 +79,9 @@ class CinemaHallEntity {
     @ManyToOne
     @MapsId("cinemaId")
     private CinemaEntity cinema;
+
+    @Version
+    private Long version;
 
     protected CinemaHallEntity() {}
 

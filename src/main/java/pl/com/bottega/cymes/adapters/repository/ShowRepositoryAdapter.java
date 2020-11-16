@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import javax.transaction.Transactional;
@@ -35,7 +36,12 @@ public class ShowRepositoryAdapter implements ShowRepository {
 
     @Override
     public boolean containsShowsCollidingWith(Show show) {
-        return false;
+        return entityManager.createNamedQuery("collisionsCount", Long.class)
+                .setParameter("id", show.getId())
+                .setParameter("hallId", new CinemaHallPK(show.getCinemaHallId()))
+                .setParameter("start", show.getStartAt())
+                .setParameter("end", show.getEndAt())
+                .getSingleResult() > 0L;
     }
 }
 
@@ -43,6 +49,17 @@ public class ShowRepositoryAdapter implements ShowRepository {
 @Table(name = "shows")
 @AllArgsConstructor
 @NoArgsConstructor
+@NamedQuery(
+        name = "collisionsCount",
+        query = "SELECT count(s) FROM Show s WHERE " +
+                "(s.id != :id) AND " +
+                "(s.cinemaHall.id = :hallId) AND " +
+                "(" +
+                "(:start < s.startAt AND :end > s.startAt) OR " +
+                "(:start >= s.startAt AND :end <= s.endAt) OR " +
+                "(:start >= s.startAt AND :start < s.endAt AND :end >= s.endAt)" +
+                ")"
+)
 class ShowEntity {
     @Id
     private UUID id;

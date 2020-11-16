@@ -21,12 +21,14 @@ import java.util.UUID;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static pl.com.bottega.cymes.domain.model.CinemaHall.CinemaHallId;
+import static pl.com.bottega.cymes.domain.model.CinemaHall.Row;
 
 public class ShowRepositoryAdapterTest extends SpringAdapterTest {
 
     private Cinema lublinPlaza = new Cinema(UUID.randomUUID(), "Lublin", "Plaza");
-    private CinemaHall occupiedHall = new CinemaHall(new CinemaHall.CinemaHallId(lublinPlaza.getId(), "1"), List.of(new CinemaHall.Row("X")));
-    private CinemaHall otherHall = new CinemaHall(new CinemaHall.CinemaHallId(lublinPlaza.getId(), "1"), List.of(new CinemaHall.Row("X")));
+    private CinemaHall occupiedHall = new CinemaHall(new CinemaHallId(lublinPlaza.getId(), "1"), List.of(new Row("X")));
+    private CinemaHall otherHall = new CinemaHall(new CinemaHallId(lublinPlaza.getId(), "2"), List.of(new Row("X")));
     private Movie batman = MovieExample.builder().title("Batman").build().toDomain();
     private Instant showStart = Instant.now();
     private Instant showEnd = Instant.now().plus(2, HOURS);
