@@ -21,17 +21,7 @@ public class LockingShowScheduler implements ShowScheduler {
 
     @Override
     public void schedule(ScheduleShowCommand command) throws CinemaHallOccupiedException {
-        boolean retry = false;
-        do {
-            try {
-                transactionTemplate.execute((params) -> {
-                    entityManager.find(CinemaHallEntity.class, new CinemaHallPK(command.getCinemaHallId()), OPTIMISTIC_FORCE_INCREMENT);
-                    decorated.schedule(command);
-                    return null;
-                });
-            } catch (OptimisticLockException optimisticLockException) {
-                retry = true;
-            }
-        } while (retry);
+        // TODO add optimistic locking with retry
+        decorated.schedule(command);
     }
 }
