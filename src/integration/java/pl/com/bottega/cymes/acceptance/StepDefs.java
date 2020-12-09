@@ -227,7 +227,7 @@ public class StepDefs extends SpringAcceptanceTest {
     public void system_calculates_tickets_price_as(String price, io.cucumber.datatable.DataTable dataTable) {
         var reservationDetails = reservationFeatureObject.getReservation();
         assertThat(reservationDetails.getReceipt().getTotal()).isEqualTo(BigDecimal.valueOf(Double.parseDouble(price)));
-        assertThat(reservationDetails.getReceipt().getItems()).isEqualTo(dataTable.asMaps().stream().map((row) -> new ReservationResource.TicketsReceiptItemResponse(
+        assertThat(reservationDetails.getReceipt().getItems()).containsAll(dataTable.asMaps().stream().map((row) -> new ReservationResource.TicketsReceiptItemResponse(
                 TicketKind.valueOf(row.get("ticketKind")),
                 Integer.parseInt(row.get("count")),
                 BigDecimal.valueOf(Double.parseDouble(row.get("price"))),

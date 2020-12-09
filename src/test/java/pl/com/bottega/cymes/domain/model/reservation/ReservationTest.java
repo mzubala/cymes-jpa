@@ -42,7 +42,7 @@ public class ReservationTest {
         reservation.selectTickets(ticketsSelection);
         var receipt = reservation.getReceipt();
 
-        assertThat(receipt.getItems()).isEqualTo(
+        assertThat(receipt.getItems()).containsAll(
                 List.of(
                         new TicketsReceiptItem(TicketKind.REGULAR, 1, Money.of(15.0)),
                         new TicketsReceiptItem(TicketKind.FAMILY, 4, Money.of(10.0))
