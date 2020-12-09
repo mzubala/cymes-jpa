@@ -1,5 +1,6 @@
 package pl.com.bottega.cymes.adapters.repository;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
@@ -64,6 +65,7 @@ public class CinemaHallRepositoryAdapter implements CinemaHallRepository {
 
 @Entity(name = "CinemaHall")
 @Table(name = "cinema_halls")
+@Data
 class CinemaHallEntity {
 
     @EmbeddedId

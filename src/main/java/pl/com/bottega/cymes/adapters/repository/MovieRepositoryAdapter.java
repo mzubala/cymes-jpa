@@ -1,5 +1,6 @@
 package pl.com.bottega.cymes.adapters.repository;
 
+import lombok.Data;
 import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -79,6 +80,7 @@ public class MovieRepositoryAdapter implements MovieRepository {
 
 @Entity(name = "Movie")
 @Table(name = "movies")
+@Data
 class MovieEntity {
     @Id
     private UUID id;

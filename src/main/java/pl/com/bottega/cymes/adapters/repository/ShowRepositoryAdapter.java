@@ -1,9 +1,13 @@
 package pl.com.bottega.cymes.adapters.repository;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 import pl.com.bottega.cymes.domain.model.Show;
+import pl.com.bottega.cymes.domain.ports.AggregateNotFoundException;
 import pl.com.bottega.cymes.domain.ports.ShowRepository;
 
 import javax.persistence.Entity;
@@ -15,6 +19,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import javax.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -22,6 +27,9 @@ public class ShowRepositoryAdapter implements ShowRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private SpringDataShowRepository springDataShowRepository;
 
     @Override
     @Transactional
@@ -43,6 +51,16 @@ public class ShowRepositoryAdapter implements ShowRepository {
                 .setParameter("end", show.getEndAt())
                 .getSingleResult() > 0L;
     }
+
+    @Override
+    public Show get(UUID showId) {
+        return springDataShowRepository.findById(showId).map(ShowEntity::toDomain)
+                .orElseThrow(() -> new AggregateNotFoundException(Show.class, showId));
+    }
+}
+
+interface SpringDataShowRepository extends Repository<ShowEntity, UUID> {
+    Optional<ShowEntity> findById(UUID id);
 }
 
 @Entity(name = "Show")
@@ -62,7 +80,7 @@ public class ShowRepositoryAdapter implements ShowRepository {
 )
 class ShowEntity {
     @Id
-    private UUID id;
+    UUID id;
 
     @ManyToOne
     private CinemaHallEntity cinemaHall;
@@ -73,5 +91,13 @@ class ShowEntity {
     private Instant startAt;
 
     private Instant endAt;
+
+    Show toDomain() {
+        return new Show(id, cinemaHall.getId().toDomain(), movie.getId(), startAt, endAt);
+    }
+
+    public UUID getId() {
+        return id;
+    }
 }
 

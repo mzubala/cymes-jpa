@@ -1,8 +1,12 @@
-package pl.com.bottega.cymes.domain.ports;
+package pl.com.bottega.cymes.domain.ports.impl;
 
 import pl.com.bottega.cymes.domain.model.Movie;
 import pl.com.bottega.cymes.domain.model.Show;
 import pl.com.bottega.cymes.domain.model.commands.ScheduleShowCommand;
+import pl.com.bottega.cymes.domain.ports.CinemaHallRepository;
+import pl.com.bottega.cymes.domain.ports.MovieRepository;
+import pl.com.bottega.cymes.domain.ports.ShowRepository;
+import pl.com.bottega.cymes.domain.ports.ShowScheduler;
 
 import java.time.Duration;
 import java.time.Instant;

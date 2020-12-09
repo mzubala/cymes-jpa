@@ -5,9 +5,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaResponse;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
+import pl.com.bottega.cymes.adapters.rest.PriceListsResource.SaveMoviePriceListRequest;
+import pl.com.bottega.cymes.adapters.rest.ReservationResource;
+import pl.com.bottega.cymes.adapters.rest.ReservationResource.CreateReservationRequest;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
@@ -15,6 +19,7 @@ import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CinemaHallRespo
 import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
+import static pl.com.bottega.cymes.adapters.rest.ReservationResource.*;
 import static pl.com.bottega.cymes.adapters.rest.ShowsResource.ScheduleShowRequest;
 import static pl.com.bottega.cymes.adapters.rest.ShowsResource.SearchShowsRequest;
 import static pl.com.bottega.cymes.adapters.rest.ShowsResource.SearchedShowResponse;
@@ -106,6 +111,32 @@ public class CymesClient {
         ).exchange()
                 .expectStatus().is2xxSuccessful()
                 .returnResult(SearchedShowResponse.class).getResponseBody().collectList().block();
+    }
+
+    public void saveMoviePriceList(SaveMoviePriceListRequest saveMoviePriceListRequest) {
+        webClient.post().uri("/price-lists/movies").bodyValue(saveMoviePriceListRequest).exchange().expectStatus().is2xxSuccessful();
+    }
+
+    public void createReservation(CreateReservationRequest request) {
+        webClient.post().uri("/reservations").bodyValue(request).exchange().expectStatus().is2xxSuccessful();
+    }
+
+    public PriceListResponse getReservationPriceList(UUID reservationId) {
+        return webClient.get().uri((builder) -> builder.path("/reservations/{id}/price-list").build(reservationId.toString()))
+                .exchange().expectStatus().is2xxSuccessful()
+                .returnResult(PriceListResponse.class).getResponseBody().blockFirst();
+    }
+
+    public void selectTickets(UUID reservationId, SelectTicketsRequest request) {
+        webClient.put().uri((builder) -> builder.path("/reservations/{id}/tickets").build(reservationId))
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().is2xxSuccessful();
+    }
+
+    public GetReservationResponse getReservation(UUID reservationId) {
+        return webClient.get().uri((builder) -> builder.path("/reservations/{id}").build(reservationId)).exchange().expectStatus().is2xxSuccessful()
+                .returnResult(GetReservationResponse.class).getResponseBody().blockFirst();
     }
 
     static class GetMoviesResponse extends PaginatedSearchResultsResponse<BasicMovieInformationResponse> {

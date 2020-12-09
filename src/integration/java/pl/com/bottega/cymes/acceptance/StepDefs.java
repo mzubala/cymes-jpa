@@ -4,6 +4,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.cucumber.java.eo.Do;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -11,15 +12,19 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaRequest;
 import pl.com.bottega.cymes.adapters.rest.Errors;
 import pl.com.bottega.cymes.adapters.rest.PaginatedSearchResultsResponse;
+import pl.com.bottega.cymes.adapters.rest.ReservationResource;
 import pl.com.bottega.cymes.client.CymesClient;
 import pl.com.bottega.cymes.client.DbClient;
 import pl.com.bottega.cymes.domain.model.Genere;
+import pl.com.bottega.cymes.domain.model.pricing.TicketKind;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,6 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static pl.com.bottega.cymes.adapters.rest.CinemasResource.CreateCinemaHallRequest;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.BasicMovieInformationResponse;
 import static pl.com.bottega.cymes.adapters.rest.MoviesResource.CreateMovieRequest;
+import static pl.com.bottega.cymes.adapters.rest.PriceListsResource.SaveMoviePriceListRequest;
+import static pl.com.bottega.cymes.adapters.rest.ReservationResource.SelectTicketsRequest;
 import static pl.com.bottega.cymes.adapters.rest.ShowsResource.ScheduleShowRequest;
 import static pl.com.bottega.cymes.adapters.rest.ShowsResource.SearchShowsRequest;
 
@@ -43,9 +50,12 @@ public class StepDefs extends SpringAcceptanceTest {
     @Autowired
     private DbClient dbClient;
 
+    private ReservationFeatureObject reservationFeatureObject;
+
     @Before
     public void setup() {
-        WebTestClient webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
+        WebTestClient webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port)
+                .responseTimeout(Duration.ofMinutes(10L)).build();
         cymesClient = new CymesClient(webTestClient);
         dbClient.clean();
     }
@@ -125,6 +135,7 @@ public class StepDefs extends SpringAcceptanceTest {
         assertThat(cinemaHallInfo.getRows()).isEqualTo(dataTable.asList());
     }
 
+    @Given("network admin scheduled shows:")
     @When("network admin schedules shows:")
     public void network_admin_schedules_shows(io.cucumber.datatable.DataTable dataTable) {
         dataTable.asMaps().forEach((showAttributes) -> {
@@ -163,4 +174,64 @@ public class StepDefs extends SpringAcceptanceTest {
         });
     }
 
+    @When("network admin defines show prices for movie {string}:")
+    public void network_admin_defines_show_prices_for_movie(String movieTitle, io.cucumber.datatable.DataTable dataTable) {
+        String movieId = cymesClient.getMovieId(movieTitle);
+        cymesClient.saveMoviePriceList(new SaveMoviePriceListRequest(
+                movieId,
+                toPriceList(dataTable)
+        ));
+    }
+
+    private HashMap<TicketKind, BigDecimal> toPriceList(io.cucumber.datatable.DataTable dataTable) {
+        return dataTable.asLists().stream().reduce(
+                new HashMap<>(),
+                (acc, element) -> {
+                    acc.put(TicketKind.valueOf(element.get(0)), BigDecimal.valueOf(Double.parseDouble(element.get(1))));
+                    return acc;
+                },
+                (x, y) -> {
+                    x.putAll(y);
+                    return x;
+                }
+        );
+    }
+
+    @When("customer wants to buy tickets for {string} in {string} {string} at {string}")
+    public void customer_wants_to_buy_tickets_for_in_at(String movieTitle, String city, String cinemaName, String showStartAt) {
+        reservationFeatureObject = new ReservationFeatureObject(cymesClient);
+        reservationFeatureObject.selectShow(movieTitle, city, cinemaName, showStartAt);
+    }
+
+    @Then("customer sees following ticket prices:")
+    public void customer_sees_following_ticket_prices(io.cucumber.datatable.DataTable dataTable) {
+        assertThat(reservationFeatureObject.getPriceList().getPriceList()).isEqualTo(toPriceList(dataTable));
+    }
+
+    @When("customer selects to buy following tickets:")
+    public void customer_selects_to_buy_following_tickets(io.cucumber.datatable.DataTable dataTable) {
+        reservationFeatureObject.selectTickets(new SelectTicketsRequest(dataTable.asLists().stream().reduce(
+                        new HashMap<>(),
+                        (acc, element) -> {
+                            acc.put(TicketKind.valueOf(element.get(0)), Integer.parseInt(element.get(1)));
+                            return acc;
+                        }, (m1, m2) -> {
+                            m1.putAll(m2);
+                            return m1;
+                        }
+                )))
+        ;
+    }
+
+    @Then("system calculates tickets price as {string}:")
+    public void system_calculates_tickets_price_as(String price, io.cucumber.datatable.DataTable dataTable) {
+        var reservationDetails = reservationFeatureObject.getReservation();
+        assertThat(reservationDetails.getReceipt().getTotal()).isEqualTo(BigDecimal.valueOf(Double.parseDouble(price)));
+        assertThat(reservationDetails.getReceipt().getItems()).isEqualTo(dataTable.asMaps().stream().map((row) -> new ReservationResource.TicketsReceiptItemResponse(
+                TicketKind.valueOf(row.get("ticketKind")),
+                Integer.parseInt(row.get("count")),
+                BigDecimal.valueOf(Double.parseDouble(row.get("price"))),
+                BigDecimal.valueOf(Double.parseDouble(row.get("total")))
+        )).collect(toList()));
+    }
 }
