@@ -22,12 +22,18 @@ public class Reservation {
     private Map<TicketKind, Integer> ticketCounts;
 
     public void selectTickets(Map<TicketKind, Integer> counts) throws InvalidTicketSelection {
-        // TODO set ticketCounts unless price list does not contain any of the given ticketKind from the counts map
+        if (!priceList.containsAll(counts.keySet())) {
+            throw new InvalidTicketSelection();
+        }
+        this.ticketCounts = new HashMap<>(counts);
     }
 
     public TicketsReceipt getReceipt() {
-        // TODO return new receipt based on the tickets counts and price list
-        return null;
+        return new TicketsReceipt(ticketCounts.entrySet().stream()
+                .map((entry) -> new TicketsReceiptItem(
+                        entry.getKey(), entry.getValue(),
+                        priceList.priceOf(entry.getKey()))
+                ).collect(Collectors.toList()));
     }
 
     public static class InvalidTicketSelection extends RuntimeException {
