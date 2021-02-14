@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface CinemaHallRepository {
     void save(CinemaHall cinemaHall);
 
-    List<String> getCinemaHallNumbers(UUID fromString);
+    List<String> getCinemaHallNumbers(UUID cinemaId);
 
     CinemaHall get(CinemaHallId id);
 }

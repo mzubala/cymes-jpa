@@ -38,8 +38,8 @@ public class CinemaHallRepositoryAdapter implements CinemaHallRepository {
     }
 
     @Override
-    public List<String> getCinemaHallNumbers(UUID fromString) {
-        return springDataCinemaHallRepository.findByCinemaId(fromString);
+    public List<String> getCinemaHallNumbers(UUID cinemaId) {
+        return springDataCinemaHallRepository.findByCinemaId(cinemaId);
     }
 
     @Override
