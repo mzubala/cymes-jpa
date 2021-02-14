@@ -128,6 +128,4 @@ interface SpringDataMovieEntityRepository extends Repository<MovieEntity, UUID>,
     void save(MovieEntity movieEntity);
 
     Optional<MovieEntity> findById(UUID id);
-
-    Page<BasicMovieInformation> findByTitleLike(String phrase, Pageable pageable);
 }
