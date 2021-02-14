@@ -20,7 +20,8 @@ public class TicketsReceipt {
     }
 
     public Money getTotal() {
-        return items.stream().map(TicketsReceiptItem::getTotal).reduce(Money.ZERO, Money::add);
+        // TODO calculate and return total
+        return null;
     }
 
     private long uniqueItemsCount(List<TicketsReceiptItem> items) {
